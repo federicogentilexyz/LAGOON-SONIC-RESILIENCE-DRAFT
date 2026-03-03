@@ -1,4 +1,4 @@
-:root {
+:root {:root {
     --bg-color: #000000;
     --text-color: #ffffff;
     --accent-color: #cccccc;
@@ -24,7 +24,7 @@ body {
 #hero-section {
     position: relative;
     width: 100vw; 
-    height: 75vh; 
+    height: 90vh; 
     overflow: hidden;
 }
 
@@ -214,5 +214,58 @@ h1 {
     font-family: inherit;
     cursor: pointer;
     min-width: 140px;
+}
 
+/* Audio Gallery Section */
+#audio-gallery {
+    padding: 0 5vw 120px; /* Aligned with the sides, lots of bottom padding to clear the soundbar */
+    background-color: #000000;
+}
+
+#audio-gallery h2 {
+    font-size: 0.8rem;
+    letter-spacing: 0.15rem;
+    margin-bottom: 30px;
+    font-weight: 300;
+    color: var(--accent-color);
+    text-transform: uppercase;
+}
+
+#track-list {
+    display: grid;
+    /* Automatically creates columns based on available width */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.track-card {
+    background: #111111;
+    border: 1px solid #222222;
+    padding: 25px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+    text-align: left;
+    color: #ffffff;
+    font-family: var(--font-main);
+    display: flex;
+    flex-direction: column;
+}
+
+.track-card:hover {
+    background: #1a1a1a;
+    border-color: #444444;
+}
+
+.track-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.track-play-text {
+    font-size: 0.65rem;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
 }
