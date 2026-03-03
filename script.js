@@ -8,7 +8,7 @@ const audioLocations = {
             "properties": {
                 "id": "sanmarco",
                 "name": "Piazza San Marco",
-                "audio": "https://actions.google.com/sounds/v1/alarms/church_bell.ogg",
+                "audio": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg",
                 "video": "videos/barotti3.mp4"
             }
         },
@@ -164,4 +164,5 @@ function formatTime(seconds) {
     const min = Math.floor(seconds / 60);
     const sec = Math.floor(seconds % 60);
     return `${min}:${sec < 10? '0' : ''}${sec}`;
+
 }
