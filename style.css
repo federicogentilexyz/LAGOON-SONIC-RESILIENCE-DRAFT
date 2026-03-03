@@ -24,7 +24,7 @@ body {
 #hero-section {
     position: relative;
     width: 100vw; 
-    height: 90vh; 
+    height: 75vh; 
     overflow: hidden;
 }
 
@@ -214,4 +214,5 @@ h1 {
     font-family: inherit;
     cursor: pointer;
     min-width: 140px;
+
 }
