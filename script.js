@@ -8,7 +8,7 @@ const audioLocations = {
             "properties": {
                 "id": "sanmarco",
                 "name": "Piazza San Marco",
-                "audio": "https://actions.google.com/sounds/v1/alarms/church_bell.ogg",
+                "audio": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg",
                 "video": "videos/barotti3.mp4"
             }
         },
@@ -95,7 +95,7 @@ audioLocations.features.forEach(feature => {
     trackListContainer.appendChild(trackCard);
 
     // 3. Shared Interaction Logic (Runs whether you click the pin OR the list item)
-    const activateLocation = () => {
+    const activateLocation = async () => {
         // Reset old markers
         if (activeMarkerEl) activeMarkerEl.classList.remove('active');
         el.classList.add('active');
@@ -106,17 +106,9 @@ audioLocations.features.forEach(feature => {
         soundbar.classList.add('active');
         playPauseBtn.innerText = "LOADING...";
 
-        // Load Audio and Video
-        wavesurfer.load(feature.properties.audio);
+        // Set Video Source
         if (feature.properties.video) {
             locationVideo.src = feature.properties.video;
-            
-            // Check if the clicked location is San Marco to increase speed
-            if (feature.properties.id === 'sanmarco') {
-                locationVideo.playbackRate = 2.0;
-            } else {
-                locationVideo.playbackRate = 1.0;
-            }
         }
 
         // Trigger Map Animation
@@ -126,16 +118,39 @@ audioLocations.features.forEach(feature => {
             speed: 1.2 
         });
 
-        // Wait for zoom to finish before showing the video overlay
+        // Wait for zoom to finish before showing the video overlay and setting speed
         map.once('moveend', () => {
             if (activeMarkerEl === el) {
                 videoOverlay.classList.add('active');
+                
+                // Safely set the playback rate right before playing
+                if (feature.properties.id === 'sanmarco') {
+                    locationVideo.playbackRate = 2.0;
+                } else {
+                    locationVideo.playbackRate = 1.0;
+                }
+                
                 locationVideo.play();
             }
         });
 
         // If the user clicked from the list at the bottom, scroll them back up to the map smoothly
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Robust Promise-based audio loading to prevent getting stuck on "LOADING..."
+        try {
+            await wavesurfer.load(feature.properties.audio);
+            
+            // Only play if the user hasn't quickly clicked a different pin while loading
+            if (activeMarkerEl === el) {
+                playPauseBtn.innerText = "PAUSE";
+                timeTotal.innerText = formatTime(wavesurfer.getDuration());
+                wavesurfer.play();
+            }
+        } catch (error) {
+            console.error("Audio failed to load:", error);
+            playPauseBtn.innerText = "PLAY";
+        }
     };
 
     // Bind the exact same logic to both the map pin and the new track card
@@ -143,12 +158,7 @@ audioLocations.features.forEach(feature => {
     trackCard.addEventListener('click', activateLocation);
 });
 
-// Audio State Management
-wavesurfer.on('ready', () => {
-    playPauseBtn.innerText = "PAUSE";
-    timeTotal.innerText = formatTime(wavesurfer.getDuration());
-    wavesurfer.play();
-});
+// Audio State Management (Removed the old 'ready' event to prevent conflicts)
 
 wavesurfer.on('audioprocess', () => {
     timeCurrent.innerText = formatTime(wavesurfer.getCurrentTime());
@@ -175,9 +185,10 @@ function closeSoundbar() {
     wavesurfer.pause();
     soundbar.classList.remove('active');
     
-    // Hide Video Overlay and return to map
+    // Hide Video Overlay, pause, and reset speed
     videoOverlay.classList.remove('active');
     locationVideo.pause();
+    locationVideo.playbackRate = 1.0;
     
     // Reset Markers
     if (activeMarkerEl) {
