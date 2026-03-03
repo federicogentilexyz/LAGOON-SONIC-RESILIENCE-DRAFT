@@ -24,7 +24,7 @@ body {
 #hero-section {
     position: relative;
     width: 100vw; 
-    height: 90vh; 
+    height: 75vh; 
     overflow: hidden;
 }
 
@@ -269,3 +269,4 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 0.1rem;
 }
+
