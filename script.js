@@ -8,7 +8,7 @@ const audioLocations = {
             "properties": {
                 "id": "sanmarco",
                 "name": "Piazza San Marco",
-                "audio": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg",
+                "audio": "https://actions.google.com/sounds/v1/alarms/church_bell.ogg",
                 "video": "videos/barotti3.mp4"
             }
         },
@@ -34,6 +34,7 @@ const audioLocations = {
         }
     ]
 };
+
 // Initialize MapLibre Engine
 const map = new maplibregl.Map({
     container: 'map-wrapper',
@@ -69,17 +70,32 @@ const locationVideo = document.getElementById('location-video');
 
 let activeMarkerEl = null;
 
-// Generate Pins and Bind Events
+// Get the new container for the track list
+const trackListContainer = document.getElementById('track-list');
+
+// Generate Pins, Track Cards, and Bind Events
 audioLocations.features.forEach(feature => {
+    
+    // 1. Create the Map Pin
     const el = document.createElement('div');
     el.className = 'pin';
     el.innerHTML = '<span class="pin-dot"></span>';
 
     new maplibregl.Marker({ element: el })
-   .setLngLat(feature.geometry.coordinates)
-   .addTo(map);
+    .setLngLat(feature.geometry.coordinates)
+    .addTo(map);
 
-    el.addEventListener('click', () => {
+    // 2. Create the Track List Card
+    const trackCard = document.createElement('button');
+    trackCard.className = 'track-card';
+    trackCard.innerHTML = `
+        <span class="track-title">${feature.properties.name}</span>
+        <span class="track-play-text">PLAY RECORDING</span>
+    `;
+    trackListContainer.appendChild(trackCard);
+
+    // 3. Shared Interaction Logic (Runs whether you click the pin OR the list item)
+    const activateLocation = () => {
         // Reset old markers
         if (activeMarkerEl) activeMarkerEl.classList.remove('active');
         el.classList.add('active');
@@ -94,6 +110,13 @@ audioLocations.features.forEach(feature => {
         wavesurfer.load(feature.properties.audio);
         if (feature.properties.video) {
             locationVideo.src = feature.properties.video;
+            
+            // Check if the clicked location is San Marco to increase speed
+            if (feature.properties.id === 'sanmarco') {
+                locationVideo.playbackRate = 2.0;
+            } else {
+                locationVideo.playbackRate = 1.0;
+            }
         }
 
         // Trigger Map Animation
@@ -110,7 +133,14 @@ audioLocations.features.forEach(feature => {
                 locationVideo.play();
             }
         });
-    });
+
+        // If the user clicked from the list at the bottom, scroll them back up to the map smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Bind the exact same logic to both the map pin and the new track card
+    el.addEventListener('click', activateLocation);
+    trackCard.addEventListener('click', activateLocation);
 });
 
 // Audio State Management
@@ -164,5 +194,4 @@ function formatTime(seconds) {
     const min = Math.floor(seconds / 60);
     const sec = Math.floor(seconds % 60);
     return `${min}:${sec < 10? '0' : ''}${sec}`;
-
 }
