@@ -1,0 +1,217 @@
+:root {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --accent-color: #cccccc;
+    --font-main: 'Outfit', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+    overflow-y: auto; 
+}
+
+/* Full width map, restricted height to allow scrolling */
+#hero-section {
+    position: relative;
+    width: 100vw; 
+    height: 90vh; 
+    overflow: hidden;
+}
+
+/* Header overlays the map */
+header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 50px 30px 30px;
+    text-align: left;
+    z-index: 1000;
+    pointer-events: none; /* Allows user to click and drag the map beneath the text */
+    color: #ffffff;
+    text-shadow: 0 2px 15px rgba(0,0,0,0.8); 
+}
+
+h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.1rem;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 0.15rem;
+    margin-top: 8px;
+    font-weight: 300;
+    color: var(--accent-color);
+    text-transform: uppercase;
+}
+
+/* Map & Video Overlay */
+#map-wrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+}
+
+#video-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#location-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Text Section - Justified and Closer to the Map */
+#info-section {
+    padding: 25px 30px 120px; /* Reduced top padding from 60px to 25px */
+    background-color: #000000;
+}
+
+#info-section p {
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 800px;
+    text-align: justify; /* Changed to justified alignment */
+    color: #ffffff;
+    margin: 0 auto; /* Keeps the text block centered on larger screens */
+}
+
+/* Interactive Pins */
+.pin {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.pin-dot {
+    width: 16px;
+    height: 16px;
+    background-color: #fff;
+    border-radius: 50%;
+    border: 2px solid #000;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 10px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pin:hover.pin-dot,.pin.active.pin-dot {
+    background-color: #000;
+    border-color: #fff;
+    transform: scale(1.8);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+}
+
+/* Soundbar UI */
+#soundbar {
+    position: fixed;
+    bottom: 0; 
+    left: 0;
+    width: 100%;
+    background: #fff;
+    color: #000;
+    padding: 30px 30px calc(30px + env(safe-area-inset-bottom));
+    box-shadow: 0 -15px 50px rgba(0,0,0,0.3);
+    transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: 2000;
+    transform: translateY(100%);
+}
+
+#soundbar.active {
+    transform: translateY(0);
+}
+
+.soundbar-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.label {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 0.1rem;
+    color: #999;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+#current-location-name {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #000;
+    cursor: pointer;
+    opacity: 0.3;
+}
+
+#waveform-container {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 25px;
+}
+
+.soundbar-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.time {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: #999;
+}
+
+#play-pause-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 40px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05rem;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 140px;
+}

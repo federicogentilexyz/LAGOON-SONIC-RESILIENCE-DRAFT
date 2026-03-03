@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VENEZIA — Lagoon Sonic Resilience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main id="hero-section">
+        <header>
+            <h1>LAGOON SONIC RESILIENCE</h1>
+            <p class="subtitle">SOUND CARTOGRAPHY</p>
+        </header>
+
+        <div id="map-wrapper"></div>
+        
+        <div id="video-overlay">
+            <video id="location-video" playsinline muted loop></video>
+        </div>
+    </main>
+
+    <section id="info-section">
+        <p>Lagoon Sonic Resilience is a collaborative process in which local communities become co-creators of the project’s knowledge and artistic output.</p>
+    </section>
+
+    <div id="soundbar">
+        <div class="soundbar-header">
+            <div class="info">
+                <span class="label">RECORDING</span>
+                <span id="current-location-name">—</span>
+            </div>
+            <button class="close-btn" onclick="closeSoundbar()">✕</button>
+        </div>
+
+        <div id="waveform-container"></div>
+
+        <div class="soundbar-footer">
+            <span id="current-time" class="time">0:00</span>
+            <button id="play-pause-btn" onclick="togglePlay()">LOADING...</button>
+            <span id="total-duration" class="time">0:00</span>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
