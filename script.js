@@ -4,7 +4,7 @@ const regionsData = [
         id: "venice",
         name: "Venice Lagoon, Italy",
         coordinates: [45.4300, 12.3350], 
-        labelPos: "label-top", // Force label above the pin
+        labelPos: "label-top", 
         zoom: 13,
         subLocations: [
             { id: "v1", name: "Piazza San Marco", coords: [45.4343, 12.3397], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti2.mp4" },
@@ -16,7 +16,7 @@ const regionsData = [
         id: "jamaica",
         name: "Portland Coast, Jamaica",
         coordinates: [18.1700, -76.4000], 
-        labelPos: "label-top", // Force label above the pin to avoid Trinidad
+        labelPos: "label-top", 
         zoom: 12,
         subLocations: [
             { id: "j1", name: "Blue Lagoon", coords: [18.1725, -76.3861], labelPos: "label-bottom", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti3.mp4" },
@@ -28,7 +28,7 @@ const regionsData = [
         id: "trinidad",
         name: "Caroni Swamp, Trinidad & Tobago",
         coordinates: [10.5950, -61.4550],
-        labelPos: "label-bottom", // Force label below the pin to avoid Jamaica
+        labelPos: "label-bottom", 
         zoom: 13,
         subLocations: [
             { id: "t1", name: "Bird Sanctuary", coords: [10.5900, -61.4650], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti.mp4" },
@@ -38,20 +38,31 @@ const regionsData = [
     }
 ];
 
-// 1. Initialize Leaflet Map (Completely locked down to prevent manual zooming/panning)
+// FIX: Strictly define both Vertical and Horizontal edges of a single Earth instance
+const worldBounds = [
+    [-60, -180], // [South Limit, Exact West Limit]
+    [75, 180]    // [North Limit, Exact East Limit]
+];
+
+// 1. Initialize Leaflet Map 
 const map = L.map('map-wrapper', {
     zoomControl: false,
     scrollWheelZoom: false,
-    dragging: false,       // Disables dragging on desktop & mobile
-    touchZoom: false,      // Disables pinch-to-zoom on mobile
-    doubleClickZoom: false,// Disables double click to zoom
-    boxZoom: false,        // Disables shift+drag to zoom
-    keyboard: false        // Disables keyboard arrows to pan
+    dragging: true,        
+    touchZoom: false,      
+    doubleClickZoom: false,
+    boxZoom: false,        
+    keyboard: false,
+    maxBounds: worldBounds,    // Locks the map inside one single globe
+    maxBoundsViscosity: 1.0,   // Solid wall feel
+    minZoom: 2                 
 }).setView([20.0, -30.0], 2);
 
+// FIX: Added noWrap: true to stop the tiles from endlessly repeating
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 19,
-    subdomains: 'abcd'
+    subdomains: 'abcd',
+    noWrap: true // Prevents infinite horizontal repetition
 }).addTo(map);
 
 const markerLayerGroup = L.layerGroup().addTo(map);
@@ -79,7 +90,6 @@ const trackListContainer = document.getElementById('track-list');
 const galleryTitle = document.getElementById('gallery-title');
 const backToGlobalBtn = document.getElementById('back-to-global-btn');
 
-// The Title element we want to hide on zoom
 const mainHeader = document.getElementById('main-header');
 
 let activeMarkerDiv = null;
@@ -102,7 +112,6 @@ function loadGlobalView() {
     galleryTitle.innerText = 'GLOBAL LOCATIONS';
     backToGlobalBtn.classList.remove('active');
     
-    // Show the Main Header again
     mainHeader.classList.remove('hidden-header');
 
     map.flyTo([20.0, -30.0], 2, { duration: 1.5 });
@@ -151,7 +160,6 @@ function loadRegionView(region) {
     galleryTitle.innerText = `SOUND ARCHIVE: ${region.name.toUpperCase()}`;
     backToGlobalBtn.classList.add('active');
 
-    // Hide the Main Header to prevent overlap
     mainHeader.classList.add('hidden-header');
 
     map.flyTo(region.coordinates, region.zoom, { duration: 1.2 });
