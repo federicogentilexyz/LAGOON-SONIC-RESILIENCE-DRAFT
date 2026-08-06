@@ -20,26 +20,30 @@ body {
     overflow-y: auto; 
 }
 
-/* Full width map, restricted height to allow scrolling */
 #hero-section {
     position: relative;
     width: 100vw; 
     height: 75vh; 
-    overflow: hidden;
+    background-color: #111; 
 }
 
-/* Header overlays the map */
-header {
+#main-header {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     padding: 50px 30px 30px;
     text-align: left;
-    z-index: 1000;
-    pointer-events: none; /* Allows user to click and drag the map beneath the text */
+    z-index: 2000; 
+    pointer-events: none;
     color: #ffffff;
     text-shadow: 0 2px 15px rgba(0,0,0,0.8); 
+    transition: opacity 0.5s ease; /* Smooth fade */
+}
+
+/* Class toggled by JS to hide header when zoomed */
+#main-header.hidden-header {
+    opacity: 0;
 }
 
 h1 {
@@ -59,13 +63,50 @@ h1 {
     text-transform: uppercase;
 }
 
-/* Map & Video Overlay */
 #map-wrapper {
     width: 100%;
     height: 100%;
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 100;
+}
+
+.leaflet-control-attribution {
+    display: none !important;
+}
+
+#back-to-global-btn {
+    position: absolute;
+    top: 50px;
+    right: 30px;
+    z-index: 2000;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 10px 20px;
+    font-family: var(--font-main);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1rem;
+    border-radius: 40px;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.4s ease;
+}
+
+#back-to-global-btn.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+#back-to-global-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: #fff;
 }
 
 #video-overlay {
@@ -74,7 +115,7 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 500;
+    z-index: 1500;
     background: #000;
     opacity: 0;
     pointer-events: none;
@@ -92,9 +133,8 @@ h1 {
     object-fit: cover;
 }
 
-/* Text Section - Justified and Closer to the Map */
 #info-section {
-    padding: 25px 30px 120px; /* Reduced top padding from 60px to 25px */
+    padding: 25px 30px 60px;
     background-color: #000000;
 }
 
@@ -103,12 +143,17 @@ h1 {
     font-weight: 300;
     line-height: 1.6;
     max-width: 800px;
-    text-align: justify; /* Changed to justified alignment */
+    text-align: justify;
     color: #ffffff;
-    margin: 0 auto; /* Keeps the text block centered on larger screens */
+    margin: 0 auto;
 }
 
 /* Interactive Pins */
+.custom-leaflet-icon {
+    background: none;
+    border: none;
+}
+
 .pin {
     width: 60px;
     height: 60px;
@@ -116,23 +161,98 @@ h1 {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    position: relative; /* Anchors the smart labels */
 }
 
 .pin-dot {
-    width: 16px;
-    height: 16px;
     background-color: #fff;
     border-radius: 50%;
     border: 2px solid #000;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 10px rgba(0, 0, 0, 0.4);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.pin:hover.pin-dot,.pin.active.pin-dot {
+.region-pin .pin-dot {
+    width: 22px;
+    height: 22px;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    animation: pulse 2s infinite;
+}
+
+.sub-pin .pin-dot {
+    width: 16px;
+    height: 16px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.pin:hover .pin-dot, .pin.active .pin-dot {
     background-color: #000;
     border-color: #fff;
-    transform: scale(1.8);
+    transform: scale(1.6);
     box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+    animation: none;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* NEW SMART LABEL SYSTEM TO PREVENT OVERLAP */
+.smart-label {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-family: var(--font-main);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Explicit Positions */
+.smart-label.label-top {
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+}
+.smart-label.label-bottom {
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+}
+.smart-label.label-right {
+    left: 45px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-10px);
+}
+.smart-label.label-left {
+    right: 45px;
+    top: 50%;
+    transform: translateY(-50%) translateX(10px);
+}
+
+/* Smart Animation Logic (Hover vs Touch) */
+@media (hover: none) {
+    .smart-label.label-top { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .smart-label.label-bottom { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .smart-label.label-right { opacity: 1; transform: translateY(-50%) translateX(0); }
+    .smart-label.label-left { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+@media (hover: hover) {
+    .pin:hover .smart-label.label-top, .pin.active .smart-label.label-top { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .pin:hover .smart-label.label-bottom, .pin.active .smart-label.label-bottom { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .pin:hover .smart-label.label-right, .pin.active .smart-label.label-right { opacity: 1; transform: translateY(-50%) translateX(0); }
+    .pin:hover .smart-label.label-left, .pin.active .smart-label.label-left { opacity: 1; transform: translateY(-50%) translateX(0); }
 }
 
 /* Soundbar UI */
@@ -146,7 +266,7 @@ h1 {
     padding: 30px 30px calc(30px + env(safe-area-inset-bottom));
     box-shadow: 0 -15px 50px rgba(0,0,0,0.3);
     transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-    z-index: 2000;
+    z-index: 3000;
     transform: translateY(100%);
 }
 
@@ -216,9 +336,8 @@ h1 {
     min-width: 140px;
 }
 
-/* Audio Gallery Section */
 #audio-gallery {
-    padding: 0 5vw 120px; /* Aligned with the sides, lots of bottom padding to clear the soundbar */
+    padding: 0 5vw 120px;
     background-color: #000000;
 }
 
@@ -233,7 +352,6 @@ h1 {
 
 #track-list {
     display: grid;
-    /* Automatically creates columns based on available width */
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 15px;
 }
@@ -269,4 +387,3 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 0.1rem;
 }
-
