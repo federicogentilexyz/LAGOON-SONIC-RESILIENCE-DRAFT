@@ -7,9 +7,9 @@ const regionsData = [
         labelPos: "label-top", 
         zoom: 13,
         subLocations: [
-            { id: "v1", name: "Piazza San Marco", coords: [45.4343, 12.3397], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti2.mp4" },
-            { id: "v2", name: "Ponte di Rialto", coords: [45.4381, 12.3359], labelPos: "label-left", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti.mp4" },
-            { id: "v3", name: "Canale della Giudecca", coords: [45.4260, 12.3290], labelPos: "label-bottom", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti3.mp4" }
+            { id: "v1", name: "Piazza San Marco", coords: [45.4343, 12.3397], labelPos: "label-top", audio: "audio/sound1.mp3", video: "videos/barotti2.mp4" },
+            { id: "v2", name: "Ponte di Rialto", coords: [45.4381, 12.3359], labelPos: "label-left", audio: "audio/sound1.mp3", video: "videos/barotti.mp4" },
+            { id: "v3", name: "Canale della Giudecca", coords: [45.4260, 12.3290], labelPos: "label-bottom", audio: "audio/sound1.mp3", video: "videos/barotti3.mp4" }
         ]
     },
     {
@@ -19,9 +19,10 @@ const regionsData = [
         labelPos: "label-top", 
         zoom: 12,
         subLocations: [
-            { id: "j1", name: "Blue Lagoon", coords: [18.1725, -76.3861], labelPos: "label-bottom", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti3.mp4" },
-            { id: "j2", name: "Boston Bay", coords: [18.1561, -76.3550], labelPos: "label-right", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti.mp4" },
-            { id: "j3", name: "Frenchman's Cove", coords: [18.1764, -76.3980], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti2.mp4" }
+            { id: "j1", name: "Blue Lagoon", coords: [18.1725, -76.3861], labelPos: "label-bottom", audio: "audio/sound1.mp3", video: "videos/barotti3.mp4" },
+            { id: "j2", name: "Boston Bay", coords: [18.1561, -76.3550], labelPos: "label-right", audio: "audio/sound1.mp3", video: "videos/barotti.mp4" },
+            { id: "j3", name: "Frenchman's Cove", coords: [18.1764, -76.3980], labelPos: "label-top", audio: "audio/sound1.mp3", video: "videos/barotti2.mp4" },
+            { id: "j4", name: "Winnifred Beach", coords: [18.1640, -76.3690], labelPos: "label-bottom", audio: "audio/sound1.mp3", video: "videos/barotti.mp4" }
         ]
     },
     {
@@ -31,17 +32,18 @@ const regionsData = [
         labelPos: "label-bottom", 
         zoom: 13,
         subLocations: [
-            { id: "t1", name: "Bird Sanctuary", coords: [10.5900, -61.4650], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti.mp4" },
-            { id: "t2", name: "Mangrove Boardwalk", coords: [10.6000, -61.4500], labelPos: "label-bottom", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti3.mp4" },
-            { id: "t3", name: "River Mouth", coords: [10.5850, -61.4700], labelPos: "label-right", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti2.mp4" }
+            { id: "t1", name: "Bird Sanctuary", coords: [10.5900, -61.4650], labelPos: "label-top", audio: "audio/sound1.mp3", video: "videos/barotti.mp4" },
+            { id: "t2", name: "Mangrove Boardwalk", coords: [10.6000, -61.4500], labelPos: "label-bottom", audio: "audio/sound1.mp3", video: "videos/barotti3.mp4" },
+            { id: "t3", name: "River Mouth", coords: [10.5850, -61.4700], labelPos: "label-right", audio: "audio/sound1.mp3", video: "videos/barotti2.mp4" }
         ]
     }
 ];
 
-// FIX: Strictly define both Vertical and Horizontal edges of a single Earth instance
+// Expanded the horizontal boundaries so wide desktop monitors can paint 
+// the map edge-to-edge, while still stopping the user from panning infinitely.
 const worldBounds = [
-    [-60, -180], // [South Limit, Exact West Limit]
-    [75, 180]    // [North Limit, Exact East Limit]
+    [-60, -250], 
+    [75, 250]    
 ];
 
 // 1. Initialize Leaflet Map 
@@ -53,20 +55,20 @@ const map = L.map('map-wrapper', {
     doubleClickZoom: false,
     boxZoom: false,        
     keyboard: false,
-    maxBounds: worldBounds,    // Locks the map inside one single globe
-    maxBoundsViscosity: 1.0,   // Solid wall feel
+    maxBounds: worldBounds,    
+    maxBoundsViscosity: 1.0,   
     minZoom: 2                 
 }).setView([20.0, -30.0], 2);
 
-// FIX: Added noWrap: true to stop the tiles from endlessly repeating
+// We removed noWrap: true so the edges of the map can render correctly on ultrawide displays
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 19,
-    subdomains: 'abcd',
-    noWrap: true // Prevents infinite horizontal repetition
+    subdomains: 'abcd'
 }).addTo(map);
 
 const markerLayerGroup = L.layerGroup().addTo(map);
 
+// 2. Initialize Wavesurfer Engine
 const wavesurfer = WaveSurfer.create({
     container: '#waveform-container',
     waveColor: '#eeeeee',
@@ -79,6 +81,7 @@ const wavesurfer = WaveSurfer.create({
     cursorWidth: 2
 });
 
+// DOM Elements
 const soundbar = document.getElementById('soundbar');
 const playPauseBtn = document.getElementById('play-pause-btn');
 const locationName = document.getElementById('current-location-name');
@@ -89,12 +92,12 @@ const locationVideo = document.getElementById('location-video');
 const trackListContainer = document.getElementById('track-list');
 const galleryTitle = document.getElementById('gallery-title');
 const backToGlobalBtn = document.getElementById('back-to-global-btn');
-
 const mainHeader = document.getElementById('main-header');
 
 let activeMarkerDiv = null;
 let currentActiveRegion = null;
 
+// 3. Render Views
 function loadGlobalView() {
     wavesurfer.pause();
     soundbar.classList.remove('active');
@@ -196,6 +199,7 @@ function loadRegionView(region) {
     });
 }
 
+// 4. Activate Audio & Video
 async function activateSubLocation(subLoc, markerInstance) {
     if (activeMarkerDiv) {
         activeMarkerDiv.classList.remove('active');
@@ -229,6 +233,7 @@ async function activateSubLocation(subLoc, markerInstance) {
     }
 }
 
+// 5. Audio Controls
 wavesurfer.on('audioprocess', () => {
     timeCurrent.innerText = formatTime(wavesurfer.getCurrentTime());
 });
@@ -272,4 +277,5 @@ function formatTime(seconds) {
     return `${min}:${sec < 10? '0' : ''}${sec}`;
 }
 
+// Start the app immediately
 loadGlobalView();
