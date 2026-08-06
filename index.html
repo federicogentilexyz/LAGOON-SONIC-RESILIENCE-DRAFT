@@ -1,25 +1,33 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VENEZIA — Lagoon Sonic Resilience</title>
+    <title>GLOBAL — Coastal Sonic Resilience</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     
-    <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <main id="hero-section">
-        <header>
-            <h1>LAGOON SONIC RESILIENCE</h1>
-            <p class="subtitle">SOUND CARTOGRAPHY</p>
+        <!-- Added ID here to target it with JS -->
+        <header id="main-header">
+            <h1>COASTAL SONIC RESILIENCE</h1>
+            <p class="subtitle">GLOBAL SOUND CARTOGRAPHY</p>
         </header>
 
         <div id="map-wrapper"></div>
+        
+        <button id="back-to-global-btn" onclick="loadGlobalView()">← GLOBAL MAP</button>
         
         <div id="video-overlay">
             <video id="location-video" playsinline muted loop></video>
@@ -27,10 +35,11 @@
     </main>
 
     <section id="info-section">
-        <p>Lagoon Sonic Resilience is a collaborative process in which local communities become co-creators of the project’s knowledge and artistic output.</p>
+        <p>Coastal Sonic Resilience is a global collaborative process connecting vulnerable lagoon and coastal communities as co-creators of shared knowledge and artistic output.</p>
     </section>
+    
     <section id="audio-gallery">
-        <h2>SOUND ARCHIVE</h2>
+        <h2 id="gallery-title">GLOBAL LOCATIONS</h2>
         <div id="track-list"></div>
     </section>
 
@@ -52,7 +61,8 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <script src="script.js"></script>
 </body>
