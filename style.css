@@ -23,7 +23,8 @@ body {
 #hero-section {
     position: relative;
     width: 100vw; 
-    height: 75vh; 
+    /* CHANGED: Reduced from 75vh to 65vh to show the text below */
+    height: 65vh; 
     background-color: #111; 
 }
 
@@ -38,10 +39,9 @@ body {
     pointer-events: none;
     color: #ffffff;
     text-shadow: 0 2px 15px rgba(0,0,0,0.8); 
-    transition: opacity 0.5s ease; /* Smooth fade */
+    transition: opacity 0.5s ease; 
 }
 
-/* Class toggled by JS to hide header when zoomed */
 #main-header.hidden-header {
     opacity: 0;
 }
@@ -161,7 +161,7 @@ h1 {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    position: relative; /* Anchors the smart labels */
+    position: relative; 
 }
 
 .pin-dot {
@@ -198,7 +198,7 @@ h1 {
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
-/* NEW SMART LABEL SYSTEM TO PREVENT OVERLAP */
+/* SMART LABEL SYSTEM */
 .smart-label {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.9);
@@ -240,7 +240,7 @@ h1 {
     transform: translateY(-50%) translateX(10px);
 }
 
-/* Smart Animation Logic (Hover vs Touch) */
+/* Smart Animation Logic */
 @media (hover: none) {
     .smart-label.label-top { opacity: 1; transform: translateX(-50%) translateY(0); }
     .smart-label.label-bottom { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -386,4 +386,12 @@ h1 {
     color: var(--accent-color);
     text-transform: uppercase;
     letter-spacing: 0.1rem;
+}
+
+/* NEW: Mobile specific tweaks to stop long labels from touching edges */
+@media (max-width: 768px) {
+    .smart-label {
+        font-size: 0.6rem;
+        padding: 5px 8px;
+    }
 }
