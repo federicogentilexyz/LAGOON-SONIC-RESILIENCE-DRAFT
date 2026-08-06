@@ -1,9 +1,10 @@
-// Hierarchical Data Structure (Notice the new 'labelPos' property on subLocations!)
+// Hierarchical Data Structure 
 const regionsData = [
     {
         id: "venice",
         name: "Venice Lagoon, Italy",
         coordinates: [45.4300, 12.3350], 
+        labelPos: "label-top", // Force label above the pin
         zoom: 13,
         subLocations: [
             { id: "v1", name: "Piazza San Marco", coords: [45.4343, 12.3397], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti2.mp4" },
@@ -15,6 +16,7 @@ const regionsData = [
         id: "jamaica",
         name: "Portland Coast, Jamaica",
         coordinates: [18.1700, -76.4000], 
+        labelPos: "label-top", // Force label above the pin to avoid Trinidad
         zoom: 12,
         subLocations: [
             { id: "j1", name: "Blue Lagoon", coords: [18.1725, -76.3861], labelPos: "label-bottom", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti3.mp4" },
@@ -26,6 +28,7 @@ const regionsData = [
         id: "trinidad",
         name: "Caroni Swamp, Trinidad & Tobago",
         coordinates: [10.5950, -61.4550],
+        labelPos: "label-bottom", // Force label below the pin to avoid Jamaica
         zoom: 13,
         subLocations: [
             { id: "t1", name: "Bird Sanctuary", coords: [10.5900, -61.4650], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti.mp4" },
@@ -35,9 +38,15 @@ const regionsData = [
     }
 ];
 
+// 1. Initialize Leaflet Map (Completely locked down to prevent manual zooming/panning)
 const map = L.map('map-wrapper', {
-    scrollWheelZoom: false, 
-    zoomControl: false 
+    zoomControl: false,
+    scrollWheelZoom: false,
+    dragging: false,       // Disables dragging on desktop & mobile
+    touchZoom: false,      // Disables pinch-to-zoom on mobile
+    doubleClickZoom: false,// Disables double click to zoom
+    boxZoom: false,        // Disables shift+drag to zoom
+    keyboard: false        // Disables keyboard arrows to pan
 }).setView([20.0, -30.0], 2);
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -104,7 +113,7 @@ function loadGlobalView() {
             html: `
                 <div class="pin region-pin">
                     <span class="pin-dot"></span>
-                    <span class="smart-label label-top">${region.name}</span>
+                    <span class="smart-label ${region.labelPos}">${region.name}</span>
                 </div>
             `,
             iconSize: [60, 60],
@@ -148,7 +157,6 @@ function loadRegionView(region) {
     map.flyTo(region.coordinates, region.zoom, { duration: 1.2 });
 
     region.subLocations.forEach(subLoc => {
-        // Injecting the unique directional class (subLoc.labelPos) to push labels away from each other
         const icon = L.divIcon({
             className: 'custom-leaflet-icon',
             html: `
