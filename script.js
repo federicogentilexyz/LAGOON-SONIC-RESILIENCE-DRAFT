@@ -1,51 +1,52 @@
-// GeoJSON Data Structure
-const audioLocations = {
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry": { "type": "Point", "coordinates": [12.3397, 45.4343] },
-            "properties": {
-                "id": "sanmarco",
-                "name": "Piazza San Marco",
-                "audio": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg",
-                "video": "videos/barotti3.mp4"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": { "type": "Point", "coordinates": [12.3359, 45.4381] },
-            "properties": {
-                "id": "rialto",
-                "name": "Ponte di Rialto",
-                "audio": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg",
-                "video": "videos/barotti2.mp4"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": { "type": "Point", "coordinates": [12.3290, 45.4260] },
-            "properties": {
-                "id": "canalgrande",
-                "name": "Canale della Giudecca",
-                "audio": "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg",
-                "video": "videos/barotti.mp4"
-            }
-        }
-    ]
-};
+// Hierarchical Data Structure (Notice the new 'labelPos' property on subLocations!)
+const regionsData = [
+    {
+        id: "venice",
+        name: "Venice Lagoon, Italy",
+        coordinates: [45.4300, 12.3350], 
+        zoom: 13,
+        subLocations: [
+            { id: "v1", name: "Piazza San Marco", coords: [45.4343, 12.3397], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti2.mp4" },
+            { id: "v2", name: "Ponte di Rialto", coords: [45.4381, 12.3359], labelPos: "label-left", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti.mp4" },
+            { id: "v3", name: "Canale della Giudecca", coords: [45.4260, 12.3290], labelPos: "label-bottom", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti3.mp4" }
+        ]
+    },
+    {
+        id: "jamaica",
+        name: "Portland Coast, Jamaica",
+        coordinates: [18.1700, -76.4000], 
+        zoom: 12,
+        subLocations: [
+            { id: "j1", name: "Blue Lagoon", coords: [18.1725, -76.3861], labelPos: "label-bottom", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti3.mp4" },
+            { id: "j2", name: "Boston Bay", coords: [18.1561, -76.3550], labelPos: "label-right", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti.mp4" },
+            { id: "j3", name: "Frenchman's Cove", coords: [18.1764, -76.3980], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti2.mp4" }
+        ]
+    },
+    {
+        id: "trinidad",
+        name: "Caroni Swamp, Trinidad & Tobago",
+        coordinates: [10.5950, -61.4550],
+        zoom: 13,
+        subLocations: [
+            { id: "t1", name: "Bird Sanctuary", coords: [10.5900, -61.4650], labelPos: "label-top", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti.mp4" },
+            { id: "t2", name: "Mangrove Boardwalk", coords: [10.6000, -61.4500], labelPos: "label-bottom", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti3.mp4" },
+            { id: "t3", name: "River Mouth", coords: [10.5850, -61.4700], labelPos: "label-right", audio: "https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg", video: "videos/barotti2.mp4" }
+        ]
+    }
+];
 
-// Initialize MapLibre Engine
-const map = new maplibregl.Map({
-    container: 'map-wrapper',
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', 
-    center: [12.3350, 45.4300], 
-    zoom: 13.5,
-    pitch: 35, 
-    attributionControl: false
-});
+const map = L.map('map-wrapper', {
+    scrollWheelZoom: false, 
+    zoomControl: false 
+}).setView([20.0, -30.0], 2);
 
-// Initialize Wavesurfer Engine
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    subdomains: 'abcd'
+}).addTo(map);
+
+const markerLayerGroup = L.layerGroup().addTo(map);
+
 const wavesurfer = WaveSurfer.create({
     container: '#waveform-container',
     waveColor: '#eeeeee',
@@ -58,107 +59,159 @@ const wavesurfer = WaveSurfer.create({
     cursorWidth: 2
 });
 
-// DOM Elements
 const soundbar = document.getElementById('soundbar');
 const playPauseBtn = document.getElementById('play-pause-btn');
 const locationName = document.getElementById('current-location-name');
 const timeCurrent = document.getElementById('current-time');
 const timeTotal = document.getElementById('total-duration');
-
 const videoOverlay = document.getElementById('video-overlay');
 const locationVideo = document.getElementById('location-video');
-
-let activeMarkerEl = null;
-
-// Get the new container for the track list
 const trackListContainer = document.getElementById('track-list');
+const galleryTitle = document.getElementById('gallery-title');
+const backToGlobalBtn = document.getElementById('back-to-global-btn');
 
-// Generate Pins, Track Cards, and Bind Events
-audioLocations.features.forEach(feature => {
+// The Title element we want to hide on zoom
+const mainHeader = document.getElementById('main-header');
+
+let activeMarkerDiv = null;
+let currentActiveRegion = null;
+
+function loadGlobalView() {
+    wavesurfer.pause();
+    soundbar.classList.remove('active');
+    videoOverlay.classList.remove('active');
+    locationVideo.pause();
     
-    // 1. Create the Map Pin
-    const el = document.createElement('div');
-    el.className = 'pin';
-    el.innerHTML = '<span class="pin-dot"></span>';
+    if (activeMarkerDiv) {
+        activeMarkerDiv.classList.remove('active');
+        activeMarkerDiv = null;
+    }
 
-    new maplibregl.Marker({ element: el })
-    .setLngLat(feature.geometry.coordinates)
-    .addTo(map);
+    markerLayerGroup.clearLayers();
+    currentActiveRegion = null;
+    trackListContainer.innerHTML = '';
+    galleryTitle.innerText = 'GLOBAL LOCATIONS';
+    backToGlobalBtn.classList.remove('active');
+    
+    // Show the Main Header again
+    mainHeader.classList.remove('hidden-header');
 
-    // 2. Create the Track List Card
-    const trackCard = document.createElement('button');
-    trackCard.className = 'track-card';
-    trackCard.innerHTML = `
-        <span class="track-title">${feature.properties.name}</span>
-        <span class="track-play-text">PLAY RECORDING</span>
-    `;
-    trackListContainer.appendChild(trackCard);
+    map.flyTo([20.0, -30.0], 2, { duration: 1.5 });
 
-    // 3. Shared Interaction Logic (Runs whether you click the pin OR the list item)
-    const activateLocation = async () => {
-        // Reset old markers
-        if (activeMarkerEl) activeMarkerEl.classList.remove('active');
-        el.classList.add('active');
-        activeMarkerEl = el;
-
-        // Update UI
-        locationName.innerText = feature.properties.name;
-        soundbar.classList.add('active');
-        playPauseBtn.innerText = "LOADING...";
-
-        // Set Video Source
-        if (feature.properties.video) {
-            locationVideo.src = feature.properties.video;
-        }
-
-        // Trigger Map Animation
-        map.flyTo({ 
-            center: feature.geometry.coordinates, 
-            zoom: 16.5, 
-            speed: 1.2 
+    regionsData.forEach(region => {
+        const icon = L.divIcon({
+            className: 'custom-leaflet-icon',
+            html: `
+                <div class="pin region-pin">
+                    <span class="pin-dot"></span>
+                    <span class="smart-label label-top">${region.name}</span>
+                </div>
+            `,
+            iconSize: [60, 60],
+            iconAnchor: [30, 30] 
         });
 
-        // Wait for zoom to finish before showing the video overlay and setting speed
-        map.once('moveend', () => {
-            if (activeMarkerEl === el) {
-                videoOverlay.classList.add('active');
-                
-                // Safely set the playback rate right before playing
-                if (feature.properties.id === 'sanmarco') {
-                    locationVideo.playbackRate = 2.0;
-                } else {
-                    locationVideo.playbackRate = 1.0;
-                }
-                
-                locationVideo.play();
-            }
+        const marker = L.marker(region.coordinates, { icon: icon }).addTo(markerLayerGroup);
+
+        const card = document.createElement('button');
+        card.className = 'track-card';
+        card.innerHTML = `
+            <span class="track-title">${region.name}</span>
+            <span class="track-play-text">EXPLORE REGION</span>
+        `;
+        trackListContainer.appendChild(card);
+
+        const openRegion = () => loadRegionView(region);
+        marker.on('click', openRegion);
+        card.addEventListener('click', () => {
+            openRegion();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+}
+
+function loadRegionView(region) {
+    wavesurfer.pause();
+    soundbar.classList.remove('active');
+    videoOverlay.classList.remove('active');
+    locationVideo.pause();
+
+    markerLayerGroup.clearLayers();
+    currentActiveRegion = region;
+    trackListContainer.innerHTML = '';
+    galleryTitle.innerText = `SOUND ARCHIVE: ${region.name.toUpperCase()}`;
+    backToGlobalBtn.classList.add('active');
+
+    // Hide the Main Header to prevent overlap
+    mainHeader.classList.add('hidden-header');
+
+    map.flyTo(region.coordinates, region.zoom, { duration: 1.2 });
+
+    region.subLocations.forEach(subLoc => {
+        // Injecting the unique directional class (subLoc.labelPos) to push labels away from each other
+        const icon = L.divIcon({
+            className: 'custom-leaflet-icon',
+            html: `
+                <div class="pin sub-pin">
+                    <span class="pin-dot"></span>
+                    <span class="smart-label ${subLoc.labelPos || 'label-top'}">${subLoc.name}</span>
+                </div>
+            `,
+            iconSize: [60, 60],
+            iconAnchor: [30, 30]
         });
 
-        // If the user clicked from the list at the bottom, scroll them back up to the map smoothly
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const marker = L.marker(subLoc.coords, { icon: icon }).addTo(markerLayerGroup);
 
-        // Robust Promise-based audio loading to prevent getting stuck on "LOADING..."
-        try {
-            await wavesurfer.load(feature.properties.audio);
-            
-            // Only play if the user hasn't quickly clicked a different pin while loading
-            if (activeMarkerEl === el) {
-                playPauseBtn.innerText = "PAUSE";
-                timeTotal.innerText = formatTime(wavesurfer.getDuration());
-                wavesurfer.play();
-            }
-        } catch (error) {
-            console.error("Audio failed to load:", error);
-            playPauseBtn.innerText = "PLAY";
-        }
-    };
+        const card = document.createElement('button');
+        card.className = 'track-card';
+        card.innerHTML = `
+            <span class="track-title">${subLoc.name}</span>
+            <span class="track-play-text">PLAY RECORDING</span>
+        `;
+        trackListContainer.appendChild(card);
 
-    // Bind the exact same logic to both the map pin and the new track card
-    el.addEventListener('click', activateLocation);
-    trackCard.addEventListener('click', activateLocation);
-});
+        const playMedia = () => activateSubLocation(subLoc, marker);
+        marker.on('click', playMedia);
+        card.addEventListener('click', () => {
+            playMedia();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+}
 
-// Audio State Management (Removed the old 'ready' event to prevent conflicts)
+async function activateSubLocation(subLoc, markerInstance) {
+    if (activeMarkerDiv) {
+        activeMarkerDiv.classList.remove('active');
+    }
+    activeMarkerDiv = markerInstance._icon.querySelector('.pin');
+    activeMarkerDiv.classList.add('active');
+
+    locationName.innerText = subLoc.name;
+    soundbar.classList.add('active');
+    playPauseBtn.innerText = "LOADING...";
+
+    if (subLoc.video) {
+        locationVideo.src = subLoc.video;
+    }
+
+    map.flyTo(subLoc.coords, 16, { duration: 1.2 });
+
+    map.once('moveend', () => {
+        videoOverlay.classList.add('active');
+        locationVideo.play();
+    });
+
+    try {
+        await wavesurfer.load(subLoc.audio);
+        playPauseBtn.innerText = "PAUSE";
+        timeTotal.innerText = formatTime(wavesurfer.getDuration());
+        wavesurfer.play();
+    } catch (error) {
+        console.error("Audio failed to load:", error);
+        playPauseBtn.innerText = "PLAY";
+    }
+}
 
 wavesurfer.on('audioprocess', () => {
     timeCurrent.innerText = formatTime(wavesurfer.getCurrentTime());
@@ -181,23 +234,19 @@ function togglePlay() {
 }
 
 function closeSoundbar() {
-    // Reset Audio
     wavesurfer.pause();
     soundbar.classList.remove('active');
-    
-    // Hide Video Overlay, pause, and reset speed
     videoOverlay.classList.remove('active');
     locationVideo.pause();
-    locationVideo.playbackRate = 1.0;
     
-    // Reset Markers
-    if (activeMarkerEl) {
-        activeMarkerEl.classList.remove('active');
-        activeMarkerEl = null;
+    if (activeMarkerDiv) {
+        activeMarkerDiv.classList.remove('active');
+        activeMarkerDiv = null;
     }
     
-    // Fly back to original overview map
-    map.flyTo({ center: [12.3350, 45.4300], zoom: 13.5, pitch: 35 });
+    if (currentActiveRegion) {
+        map.flyTo(currentActiveRegion.coordinates, currentActiveRegion.zoom, { duration: 1 });
+    }
 }
 
 function formatTime(seconds) {
@@ -206,3 +255,5 @@ function formatTime(seconds) {
     const sec = Math.floor(seconds % 60);
     return `${min}:${sec < 10? '0' : ''}${sec}`;
 }
+
+loadGlobalView();
