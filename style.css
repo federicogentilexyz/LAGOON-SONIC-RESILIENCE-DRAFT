@@ -23,9 +23,14 @@ body {
 #hero-section {
     position: relative;
     width: 100vw; 
-    /* CHANGED: Reduced from 75vh to 65vh to show the text below */
-    height: 65vh; 
+    /* Set to 85vh to show just the top edge of the text, encouraging users to scroll */
+    height: 85vh; 
     background-color: #111; 
+}
+
+/* Fixes the "white space" void behind the map tiles when dragging */
+.leaflet-container {
+    background-color: #111 !important; 
 }
 
 #main-header {
@@ -198,18 +203,21 @@ h1 {
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
-/* SMART LABEL SYSTEM */
+/* SMART LABEL SYSTEM - Scaled Down */
 .smart-label {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
     font-family: var(--font-main);
-    font-size: 0.7rem;
+    
+    /* Shrunk text and padding to prevent overlaps */
+    font-size: 0.6rem; 
+    padding: 4px 8px; 
+    
     font-weight: 600;
     letter-spacing: 0.1rem;
     text-transform: uppercase;
-    padding: 6px 12px;
     border-radius: 4px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     white-space: nowrap;
@@ -220,22 +228,22 @@ h1 {
 
 /* Explicit Positions */
 .smart-label.label-top {
-    bottom: 45px;
+    bottom: 40px; 
     left: 50%;
     transform: translateX(-50%) translateY(10px);
 }
 .smart-label.label-bottom {
-    top: 45px;
+    top: 40px; 
     left: 50%;
     transform: translateX(-50%) translateY(-10px);
 }
 .smart-label.label-right {
-    left: 45px;
+    left: 40px; 
     top: 50%;
     transform: translateY(-50%) translateX(-10px);
 }
 .smart-label.label-left {
-    right: 45px;
+    right: 40px; 
     top: 50%;
     transform: translateY(-50%) translateX(10px);
 }
@@ -388,10 +396,10 @@ h1 {
     letter-spacing: 0.1rem;
 }
 
-/* NEW: Mobile specific tweaks to stop long labels from touching edges */
+/* Mobile specific tweaks */
 @media (max-width: 768px) {
     .smart-label {
-        font-size: 0.6rem;
-        padding: 5px 8px;
+        font-size: 0.5rem; /* Shrunk further for mobile to prevent overlap */
+        padding: 3px 6px;
     }
 }
