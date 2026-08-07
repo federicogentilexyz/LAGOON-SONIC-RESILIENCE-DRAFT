@@ -23,7 +23,7 @@ body {
 #hero-section {
     position: relative;
     width: 100vw; 
-    height: 85vh; /* Leaves just enough room to show the text below */
+    height: 85vh; /* Desktop keeps the large immersive height */
     background-color: #111; 
 }
 
@@ -185,7 +185,7 @@ h1 {
     font-weight: 300;
     line-height: 1.6;
     max-width: 800px;
-    text-align: left; /* Left-aligned per your request */
+    text-align: left; 
     color: #ffffff;
     margin: 0 auto;
 }
@@ -430,10 +430,30 @@ h1 {
     letter-spacing: 0.1rem;
 }
 
-/* Mobile specific tweaks */
+/* --- MOBILE SPECIFIC TWEAKS --- */
 @media (max-width: 768px) {
+    /* 1. Shrink the map height on mobile to leave a huge thumb-scroll zone below */
+    #hero-section {
+        height: 60vh; 
+    }
+    
+    /* 2. Push the text up slightly so the user instantly sees a large block of it */
+    #info-section {
+        padding: 35px 25px 60px;
+    }
+
+    #info-section p {
+        font-size: 1.3rem; /* Slightly smaller text for better mobile readability */
+    }
+
+    /* 3. Keep labels small to prevent overlap */
     .smart-label {
         font-size: 0.5rem; 
         padding: 3px 6px;
+    }
+    
+    /* 4. Adjust the scroll indicator so it doesn't crash into the bottom */
+    #scroll-indicator {
+        bottom: 25px;
     }
 }
