@@ -434,7 +434,7 @@ h1 {
 @media (max-width: 768px) {
     /* 1. Shrink the map height on mobile to leave a huge thumb-scroll zone below */
     #hero-section {
-        height: 60vh; 
+        height: 75vh; 
     }
     
     /* 2. Push the text up slightly so the user instantly sees a large block of it */
