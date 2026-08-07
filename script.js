@@ -36,6 +36,19 @@ const regionsData = [
             { id: "t2", name: "Mangrove Boardwalk", coords: [10.6000, -61.4500], labelPos: "label-bottom", audio: "audio/sound1.mp3", video: "videos/barotti3.mp4" },
             { id: "t3", name: "River Mouth", coords: [10.5850, -61.4700], labelPos: "label-right", audio: "audio/sound1.mp3", video: "videos/barotti2.mp4" }
         ]
+    },
+    // NEW LOCATION: Feridhoo Island, Maldives
+    {
+        id: "feridhoo",
+        name: "Feridhoo Island, Maldives",
+        coordinates: [4.0416, 72.7297],
+        labelPos: "label-top",
+        zoom: 12, // Slightly zoomed out to see the neighboring islands comfortably
+        subLocations: [
+            { id: "f1", name: "Feridhoo South", coords: [4.0380, 72.7290], labelPos: "label-bottom", audio: "audio/sound1.mp3", video: "videos/barotti.mp4" },
+            { id: "f2", name: "Madoougali", coords: [4.0933, 72.7483], labelPos: "label-top", audio: "audio/sound1.mp3", video: "videos/barotti2.mp4" },
+            { id: "f3", name: "Finolhu", coords: [4.0600, 72.7350], labelPos: "label-right", audio: "audio/sound1.mp3", video: "videos/barotti3.mp4" }
+        ]
     }
 ];
 
